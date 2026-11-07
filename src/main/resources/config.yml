@@ -1,0 +1,27 @@
+# Ayarlar (degistirdikten sonra sunucuyu yeniden baslat)
+baslangic-parasi: 500
+maas-dakika: 10          # kac dakikada bir maas
+maas-carpan: 100         # maas = carpan * (rutbe + 1)
+
+paket:
+  adet: 5                # /paket ile kac paket
+  bekleme-saniye: 30
+  satis-fiyati: 40       # paket basi para
+  satis-xp: 5            # paket basi XP (kacakci ise)
+
+polis:
+  arama-odul: 100        # bulunan paket basi
+  arama-xp: 10
+  tutuklama-xp: 20
+
+mafya:
+  harac-yuzde: 10
+  harac-max: 200
+  harac-bekleme-saniye: 120
+  harac-xp: 15
+
+madenci:
+  cevher-para: 10
+  cevher-xp: 2
+
+# Noktalar /rpadmin setnokta <tedarik|satis|hapis> ile ayarlanir
