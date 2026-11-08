@@ -126,11 +126,14 @@ public class Kit implements Listener {
                 items.add(make(Material.ENDER_PEARL, 2, "§5Kaçış İncisi", tag, "§7Polisten kaçmak için."));
                 break;
             }
-            default: {
+            case MADENCI: {
                 Material[] pick = {Material.STONE_PICKAXE, Material.IRON_PICKAXE, Material.DIAMOND_PICKAXE};
                 items.add(make(pick[tier], 1, "§7Maden Kazması", tag, "§7Cevher kır, para kazan."));
                 items.add(make(Material.TORCH, 32, "§7Maden Feneri", tag));
                 items.add(make(Material.BREAD, 8, "§7Maden Yemeği", tag));
+                break;
+            }
+            default: {
                 break;
             }
         }

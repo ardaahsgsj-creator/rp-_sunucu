@@ -1,7 +1,7 @@
 name: RpSunucusu
 version: 1.0
 main: com.rp.RpPlugin
-api-version: "1.20"
+api-version: "1.21"
 description: Mafya / Polis / Kacakci RP sistemi
 
 commands:

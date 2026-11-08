@@ -10,7 +10,15 @@ public enum Job {
     KACAKCI("Kaçakçı", Material.CHEST, "§5",
             "Acemi", "Taşıyıcı", "Tedarikçi", "Baron", "Kartel Lideri"),
     MADENCI("Madenci", Material.IRON_PICKAXE, "§7",
-            "Çırak", "Usta", "Ocak Başı", "Mühendis", "Maden Patronu");
+            "Çırak", "Usta", "Ocak Başı", "Mühendis", "Maden Patronu"),
+    ESNAF("Esnaf", Material.EMERALD, "§a",
+            "Çırak", "Tezgahtar", "Dükkan Sahibi", "Tüccar", "Ticaret Baronu"),
+    DOKTOR("Doktor", Material.GOLDEN_APPLE, "§b",
+            "Stajyer Doktor", "Pratisyen", "Uzman Doktor", "Başhekim", "Profesör"),
+    AVUKAT("Avukat", Material.WRITABLE_BOOK, "§6",
+            "Stajyer Avukat", "Avukat", "Kıdemli Avukat", "Ortak Avukat", "Baro Başkanı"),
+    EMLAKCI("Emlakçı", Material.OAK_DOOR, "§e",
+            "Çırak", "Satış Danışmanı", "Gayrimenkul Uzmanı", "Emlak Müdürü", "Emlak Patronu");
 
     /** Rütbe için gereken XP eşikleri */
     public static final int[] THRESH = {0, 100, 300, 700, 1500};

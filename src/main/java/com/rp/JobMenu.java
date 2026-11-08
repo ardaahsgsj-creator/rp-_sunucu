@@ -18,8 +18,8 @@ import java.util.List;
 
 public class JobMenu implements InventoryHolder {
 
-    // 5 satırlık menü: meslekler ortadaki satırda
-    private static final int[] SLOTS = {19, 21, 23, 25};
+    // 6 satırlık menü: üstte 4, altta 4 meslek (her biri kendi kutucuğunda)
+    private static final int[] SLOTS = {10, 12, 14, 16, 37, 39, 41, 43};
     private final RpPlugin plugin;
     private Inventory inv;
 
@@ -45,20 +45,32 @@ public class JobMenu implements InventoryHolder {
             case MAFYA: return Material.RED_STAINED_GLASS_PANE;
             case POLIS: return Material.BLUE_STAINED_GLASS_PANE;
             case KACAKCI: return Material.PURPLE_STAINED_GLASS_PANE;
-            default: return Material.LIGHT_GRAY_STAINED_GLASS_PANE;
+            case MADENCI: return Material.LIGHT_GRAY_STAINED_GLASS_PANE;
+            case ESNAF: return Material.GREEN_STAINED_GLASS_PANE;
+            case DOKTOR: return Material.CYAN_STAINED_GLASS_PANE;
+            case AVUKAT: return Material.ORANGE_STAINED_GLASS_PANE;
+            default: return Material.YELLOW_STAINED_GLASS_PANE;
         }
     }
 
     private static String[] descOf(Job j) {
         switch (j) {
             case MAFYA:
-                return new String[]{"§7Şehrin karanlık yüzü.", "§7Haraç topla, rütbe atla,", "§7Mafya Babası ol!"};
+                return new String[]{"§7Şehrin karanlık yüzü.", "§7Haraç topla: §f/harac <oyuncu>"};
             case POLIS:
-                return new String[]{"§7Düzeni sağla.", "§7Ara, tutukla, ödül kazan,", "§7Emniyet Müdürü ol!"};
+                return new String[]{"§7Düzeni sağla.", "§f/ara  /tutukla  /serbest"};
             case KACAKCI:
-                return new String[]{"§7Mal al, kaçır, sat.", "§7Polise yakalanma!", "§7Kartel Lideri ol!"};
+                return new String[]{"§7Mal al, kaçır, sat.", "§f/paket  /sat  §7(polise yakalanma!)"};
+            case MADENCI:
+                return new String[]{"§7Cevher kır, para kazan.", "§7Güvenli ve sabit gelir."};
+            case ESNAF:
+                return new String[]{"§7Eşya al, satış yap.", "§7Elindekini teklif et:", "§f/teklif <oyuncu> <fiyat>"};
+            case DOKTOR:
+                return new String[]{"§7Yaralıları iyileştir.", "§f/iyilestir <oyuncu>"};
+            case AVUKAT:
+                return new String[]{"§7Tutuklu müvekkillerin", "§7cezasını kısalt.", "§f/savun <oyuncu>"};
             default:
-                return new String[]{"§7Cevher kır, para kazan.", "§7Güvenli ve sabit gelir.", "§7Maden Patronu ol!"};
+                return new String[]{"§7Tapu sat, arsa ve ev ticareti.", "§f/teklif <oyuncu> <fiyat>"};
         }
     }
 
@@ -77,12 +89,12 @@ public class JobMenu implements InventoryHolder {
         RpPlugin plugin = (RpPlugin) Bukkit.getPluginManager().getPlugin("RpSunucusu");
         if (plugin == null) return;
         JobMenu menu = new JobMenu(plugin);
-        menu.inv = Bukkit.createInventory(menu, 45, "§6§l✦ §e§lMESLEK SEÇ §6§l✦");
+        menu.inv = Bukkit.createInventory(menu, 54, "§6§l✦ §e§lMESLEK SEÇ §6§l✦");
         PlayerData d = plugin.get(p);
 
         // Arka plan
         ItemStack bg = pane(Material.BLACK_STAINED_GLASS_PANE, " ");
-        for (int i = 0; i < 45; i++) menu.inv.setItem(i, bg);
+        for (int i = 0; i < 54; i++) menu.inv.setItem(i, bg);
 
         Job[] jobs = Job.values();
         for (int i = 0; i < jobs.length && i < SLOTS.length; i++) {
@@ -134,7 +146,7 @@ public class JobMenu implements InventoryHolder {
         il.add("§8Meslek değiştirince XP'n silinmez.");
         im.setLore(il);
         info.setItemMeta(im);
-        menu.inv.setItem(40, info);
+        menu.inv.setItem(49, info);
 
         // Üst ortada başlık
         ItemStack title = new ItemStack(Material.NETHER_STAR);
