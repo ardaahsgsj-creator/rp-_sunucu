@@ -30,6 +30,20 @@ public class Hud {
             "§6§l✦ ŞEHİR RP ✦", "§e§l✦ ŞEHİR RP ✦", "§f§l✦ ŞEHİR RP ✦", "§e§l✦ ŞEHİR RP ✦"
     };
     private int frame = 0;
+    private final Map<UUID, Integer> titleIdx = new HashMap<>();
+
+    private static final Statistic PLAY_STAT = findPlayStat();
+
+    private static Statistic findPlayStat() {
+        for (String n : new String[]{"PLAY_ONE_MINUTE", "PLAY_TIME"}) {
+            try {
+                return Statistic.valueOf(n);
+            } catch (IllegalArgumentException ignored) {
+                // bu surumde yok, siradakini dene
+            }
+        }
+        return null;
+    }
 
     private final RpPlugin plugin;
     private final Map<UUID, Scoreboard> boards = new HashMap<>();
@@ -76,6 +90,7 @@ public class Hud {
     private void updateAll() {
         frame++;
         boards.keySet().removeIf(id -> Bukkit.getPlayer(id) == null);
+        titleIdx.keySet().removeIf(id -> Bukkit.getPlayer(id) == null);
         for (Player p : Bukkit.getOnlinePlayers()) {
             PlayerData d = plugin.get(p);
             if (!d.loggedIn) {
@@ -139,8 +154,12 @@ public class Hud {
         };
         Objective obj = sb.getObjective("rp");
         if (obj != null) {
-            String baslik = BASLIK[(frame / 2) % BASLIK.length];
-            if (!baslik.equals(obj.getDisplayName())) obj.setDisplayName(baslik);
+            int idx = (frame / 2) % BASLIK.length;
+            Integer last = titleIdx.get(p.getUniqueId());
+            if (last == null || last != idx) {
+                obj.setDisplayName(BASLIK[idx]);
+                titleIdx.put(p.getUniqueId(), idx);
+            }
         }
         for (int i = 0; i < LINES; i++) {
             sb.getTeam("l" + i).setPrefix(lines[i]);
@@ -150,7 +169,8 @@ public class Hud {
     }
 
     private static String playtime(Player p) {
-        long sec = p.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20L;
+        if (PLAY_STAT == null) return "-";
+        long sec = p.getStatistic(PLAY_STAT) / 20L;
         long h = sec / 3600;
         long m = (sec % 3600) / 60;
         long sn = sec % 60;
