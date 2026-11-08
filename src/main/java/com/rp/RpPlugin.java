@@ -48,7 +48,7 @@ public class RpPlugin extends JavaPlugin {
         // Hapis kontrolü (her saniye)
         Bukkit.getScheduler().runTaskTimer(this, this::jailTick, 20L, 20L);
 
-        new Hud(this).start(); // Otomatik kayıt (5 dk)
+        new Hud(this).start(); new Kit(this); // Otomatik kayıt (5 dk)
         Bukkit.getScheduler().runTaskTimer(this, this::saveAll, 6000L, 6000L);
 
         // Reload durumunda online oyuncular
