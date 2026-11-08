@@ -50,4 +50,149 @@ public class JobMenu implements InventoryHolder {
     }
 
     private static String[] descOf(Job j) {
-        switch
+        switch (j) {
+            case MAFYA:
+                return new String[]{"§7Şehrin karanlık yüzü.", "§7Haraç topla, rütbe atla,", "§7Mafya Babası ol!"};
+            case POLIS:
+                return new String[]{"§7Düzeni sağla.", "§7Ara, tutukla, ödül kazan,", "§7Emniyet Müdürü ol!"};
+            case KACAKCI:
+                return new String[]{"§7Mal al, kaçır, sat.", "§7Polise yakalanma!", "§7Kartel Lideri ol!"};
+            default:
+                return new String[]{"§7Cevher kır, para kazan.", "§7Güvenli ve sabit gelir.", "§7Maden Patronu ol!"};
+        }
+    }
+
+    private static String progressBar(Job j, int xp) {
+        int idx = j.rankIndex(xp);
+        if (idx >= Job.THRESH.length - 1) return "§6★ MAKSİMUM RÜTBE ★";
+        int from = Job.THRESH[idx];
+        int to = Job.THRESH[idx + 1];
+        int filled = (int) Math.round(10.0 * (xp - from) / (to - from));
+        if (filled < 0) filled = 0;
+        if (filled > 10) filled = 10;
+        return "§a" + "■".repeat(filled) + "§8" + "■".repeat(10 - filled) + " §f" + xp + "§7/§f" + to + " XP";
+    }
+
+    public static void open(Player p) {
+        RpPlugin plugin = (RpPlugin) Bukkit.getPluginManager().getPlugin("RpSunucusu");
+        if (plugin == null) return;
+        JobMenu menu = new JobMenu(plugin);
+        menu.inv = Bukkit.createInventory(menu, 45, "§6§l✦ §e§lMESLEK SEÇ §6§l✦");
+        PlayerData d = plugin.get(p);
+
+        // Arka plan
+        ItemStack bg = pane(Material.BLACK_STAINED_GLASS_PANE, " ");
+        for (int i = 0; i < 45; i++) menu.inv.setItem(i, bg);
+
+        Job[] jobs = Job.values();
+        for (int i = 0; i < jobs.length && i < SLOTS.length; i++) {
+            Job j = jobs[i];
+            boolean current = j.name().equals(d.job);
+            int xp = d.xpOf(j);
+
+            // Meslek ikonunun üstü ve altı renkli cam (seçili meslek yeşil)
+            Material pm = current ? Material.LIME_STAINED_GLASS_PANE : paneOf(j);
+            ItemStack colored = pane(pm, j.color + "§l" + j.display);
+            menu.inv.setItem(SLOTS[i] - 9, colored);
+            menu.inv.setItem(SLOTS[i] + 9, colored);
+
+            ItemStack it = new ItemStack(j.icon);
+            ItemMeta m = it.getItemMeta();
+            m.setDisplayName(j.color + "§l" + j.display.toUpperCase() + (current ? " §a§l✔" : ""));
+            m.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+
+            List<String> lore = new ArrayList<>();
+            lore.add("§8§m                          ");
+            for (String s : descOf(j)) lore.add(s);
+            lore.add("");
+            lore.add("§6§lRÜTBELER");
+            int cur = j.rankIndex(xp);
+            for (int r = 0; r < j.ranks.length; r++) {
+                String mark = r == cur ? " §a◀ Sen" : "";
+                String color = r <= cur ? "§f" : "§8";
+                lore.add(" " + color + "▪ " + j.ranks[r] + mark);
+            }
+            lore.add("");
+            lore.add("§7Rütben: " + j.color + j.rankName(xp));
+            lore.add(progressBar(j, xp));
+            lore.add("§8§m                          ");
+            lore.add(current ? "§a✔ Şu an bu meslektesin" : "§e▶ Seçmek için tıkla!");
+            m.setLore(lore);
+            it.setItemMeta(m);
+            menu.inv.setItem(SLOTS[i], it);
+        }
+
+        // Alt ortada oyuncu bilgisi
+        ItemStack info = new ItemStack(Material.GOLD_INGOT);
+        ItemMeta im = info.getItemMeta();
+        im.setDisplayName("§6§l" + p.getName());
+        List<String> il = new ArrayList<>();
+        il.add("§7Bakiye: §a$" + (int) d.money);
+        Job cj = Job.from(d.job);
+        il.add("§7Meslek: " + (cj == null ? "§cYok" : cj.color + cj.display));
+        il.add("");
+        il.add("§8Meslek değiştirince XP'n silinmez.");
+        im.setLore(il);
+        info.setItemMeta(im);
+        menu.inv.setItem(40, info);
+
+        // Üst ortada başlık
+        ItemStack title = new ItemStack(Material.NETHER_STAR);
+        ItemMeta tm = title.getItemMeta();
+        tm.setDisplayName("§e§lŞehre Hoş Geldin!");
+        List<String> tl = new ArrayList<>();
+        tl.add("§7Bir meslek seç ve");
+        tl.add("§7kendi hikayeni yaz.");
+        tm.setLore(tl);
+        title.setItemMeta(tm);
+        menu.inv.setItem(4, title);
+
+        p.openInventory(menu.inv);
+    }
+
+    public static class MenuListener implements Listener {
+        private final RpPlugin plugin;
+
+        public MenuListener(RpPlugin plugin) {
+            this.plugin = plugin;
+        }
+
+        @EventHandler
+        public void onClick(InventoryClickEvent e) {
+            if (!(e.getInventory().getHolder() instanceof JobMenu)) return;
+            e.setCancelled(true);
+            if (!(e.getWhoClicked() instanceof Player)) return;
+            Player p = (Player) e.getWhoClicked();
+            if (e.getClickedInventory() == null || e.getClickedInventory() != e.getInventory()) return;
+
+            Job[] jobs = Job.values();
+            for (int i = 0; i < jobs.length && i < SLOTS.length; i++) {
+                if (e.getSlot() == SLOTS[i]) {
+                    PlayerData d = plugin.get(p);
+                    Job j = jobs[i];
+                    d.job = j.name();
+                    plugin.save(p.getUniqueId());
+                    p.closeInventory();
+                    p.sendTitle(j.color + "§l" + j.display.toUpperCase(), "§7" + j.rankName(d.xpOf(j)), 10, 50, 15);
+                    p.sendMessage(RpPlugin.PREFIX + "§aArtık bir " + j.color + j.display
+                            + " §a(" + j.color + j.rankName(d.xpOf(j)) + "§a) olarak çalışıyorsun!");
+                    return;
+                }
+            }
+        }
+
+        @EventHandler
+        public void onClose(InventoryCloseEvent e) {
+            if (!(e.getInventory().getHolder() instanceof JobMenu)) return;
+            if (!(e.getPlayer() instanceof Player)) return;
+            Player p = (Player) e.getPlayer();
+            PlayerData d = plugin.get(p);
+            // Meslek seçmeden kapatırsa tekrar aç
+            if (d.loggedIn && Job.from(d.job) == null) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (p.isOnline()) JobMenu.open(p);
+                }, 2L);
+            }
+        }
+    }
+}
