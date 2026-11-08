@@ -1,0 +1,44 @@
+name: RpSunucusu
+version: 1.0
+main: com.rp.RpPlugin
+api-version: "1.21"
+description: Mafya / Polis / Kacakci RP sistemi
+
+commands:
+  register:
+    description: Kayit ol
+    usage: /register <sifre> <sifre>
+  login:
+    description: Giris yap
+    usage: /login <sifre>
+  meslek:
+    description: Meslek menusunu ac
+  rank:
+    description: Rutbeni goster
+  para:
+    description: Paranı goster veya gonder
+    usage: /para [gonder <oyuncu> <miktar>]
+  paket:
+    description: (Kacakci) Tedarik noktasindan paket al
+  sat:
+    description: Paketleri satis noktasinda sat
+  ara:
+    description: (Polis) Oyuncuyu ara
+    usage: /ara <oyuncu>
+  tutukla:
+    description: (Polis) Oyuncuyu tutukla
+    usage: /tutukla <oyuncu> <dakika>
+  serbest:
+    description: (Basomiser+ Polis) Tutuklu birini serbest birak
+    usage: /serbest <oyuncu>
+  harac:
+    description: (Mafya) Yakindaki oyuncudan harac al
+    usage: /harac <oyuncu>
+  rpadmin:
+    description: Yonetici komutlari
+    permission: rp.admin
+    usage: /rpadmin <setnokta|paraver|xpver|sifirla>
+
+permissions:
+  rp.admin:
+    default: op
